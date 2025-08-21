@@ -1,0 +1,11 @@
+step: "Generate docking files"
+description: "Generate docking files from given converted ligand and protein files and docking txt coordinates file"
+function file: "pdbbind/for_igmodel_prep/gen_dockings"
+function: "run_batch_docking"
+basic_data_path: "data/pdbbind"
+input:
+  max_workers: "96" # number of parallel workers to use for processing
+  dataset_path: "{basic_data_path}/core/stage_2_helper_model_ready" # str, path to folder with complex subfolders
+  docking_summaries_path: "{basic_data_path}/metadata/generated/docking/docking_summaries" # str, folder to save docking summaries
+  box_file_path: "{basic_data_path}/metadata/generated/docking/docking_box_coordinates_exp.txt" # str, path to box coordinate file
+  vina_path: "~/Downloads/autodock_vina_1_1_2_linux_x86/bin/vina" # str, path to vina processing file

@@ -1,0 +1,29 @@
+pipeline:
+  name: "Initial cleanup and processing of data IGModel style"
+  version: "v1"
+  description: "Merging refined and general data folders and indexes, validation, fitlering out 2016 data, rm peptides, and rdk-unfriendly folders"
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+  basic_data_path: "data/pdbbind"
+  igmodel_initial_cleanup_input_path: "${{ basic_data_path }}/core/raw/for_use"
+  igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+  steps:
+    pipelines/merge_data_sources:
+      input:
+        input_path: "${{ igmodel_initial_cleanup_input_path }}"
+        output_paths: 
+          data_path: "${{ igmodel_initial_cleanup_output_path }}/stage_1_merged"
+          metadata_path: "${{ basic_data_path }}/metadata/generated/core_metadata"
+    shared/filter_out_data_folders:
+      input:
+        exclude_folders_index_path: "${{ basic_data_path }}/metadata/manual/exclude_data.txt"
+        main_data_path: "${{ steps.pipelines/merge_data_sources/output_paths.data_path }}"
+        output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_2_filtered_data"
+    pdbbind/rm_peptide_ligands:
+      input:
+        input_path: "${{ steps.shared/filter_out_data_folders.input.output_path }}"
+        output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_3_no_peptide_ligands"
+    pdbbind/rdk_friendly:
+      input:
+        input_path: "${{ steps.pdbbind/rm_peptide_ligands.input.output_path }}"
+        output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_4_only_rdk_friendly"

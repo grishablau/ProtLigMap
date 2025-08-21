@@ -1,0 +1,8 @@
+step: "Refine all the files to be completely ready for backbone model, igmodel in this case"
+description: "Refine all the files to be completely ready for backbone model, igmodel in this case"
+function file: "pdbbind/for_igmodel_prep/sdf_postprocess_summary"
+function: "postprocess_docking_outputs"
+basic_data_path: "data/pdbbind"
+input:
+  dataset_path: "{basic_data_path}/core/temp"
+  log_folder: "{basic_data_path}/metadata/generated/postprocess_docking_outputs_summary"

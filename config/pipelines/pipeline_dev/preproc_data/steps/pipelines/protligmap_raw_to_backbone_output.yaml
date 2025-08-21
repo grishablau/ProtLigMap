@@ -1,0 +1,27 @@
+pipeline:
+  name: "Raw to Backbone Output Pipeline"
+  version: "v1"
+  description: "This pipeline processes PDBBind raw data through the backbone model (IGModel currently), up to the point just before data splitting and standardisation"
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+  input:
+    basic_data_path: "data/pdbbind"
+  steps:
+    igmodel_initial_cleanup:
+      input:
+        input_path: "core/raw"
+        output_path: "core/stage_1_cleaned"
+    preproc_post_initial_cleanup_pre_helper_model:
+      input:
+        input_path: "${{ steps.igmodel_initial_cleanup.input.output_path }}"
+        output:
+          output_path: "core/stage_2_ready_for_helper_model"
+          metadata_path: "metadata/generated/docking"
+    preproc_post_helper_model_pre_main_model:
+      input:
+        input_paths: "${{ steps.preproc_post_initial_cleanup_pre_helper_model.input.output }}"
+        output_path: "core/stage_3_ready_for_main_model"
+    run_full_main_model:
+      input:
+        input_path: "${{ steps.preproc_post_helper_model_pre_main_model.input.output_path }}"
+      results_path: "${{ input.basic_data_path }}/../results"

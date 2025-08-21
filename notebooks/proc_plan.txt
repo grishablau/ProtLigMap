@@ -1,0 +1,33 @@
+
+
+sim = (euclidian matrixes->sim_matrix = 1/(1+dist))
+
+
+--model_data_preperation--
+
+pic50:
+raw->split->std
+
+input_features:
+raw->split->std->pca
+
+proteins:
+raw->agregated->split->std->pca->sim
+
+
+
+--model_runner--
+
+pic50:
+->sim
+
+input_features:
+->sim
+
+proteins:
+nothing, just picking up
+
+output:
+batch_data->sim
+
+

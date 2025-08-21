@@ -1,0 +1,10 @@
+step: "Remove folders with peptide ligands"
+description: "Remove folders with peptide ligands (filtering step from IGModel paper)"
+function file: "pdbbind/cleanup/remove_peptides"
+function: "filter_ligand_folders"
+basic_data_path: "data/pdbbind"
+igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+
+input:
+  input_path: "${{ igmodel_initial_cleanup_output_path }}/stage_2_filtered_data"
+  output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_3_no_peptide_ligands"

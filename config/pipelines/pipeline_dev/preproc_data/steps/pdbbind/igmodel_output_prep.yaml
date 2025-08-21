@@ -1,0 +1,12 @@
+step: "Generate igmodel outputs"
+description: "Generate igmodel outputs - embedding features and W (attention weights) and save all into one file"
+function file: "pdbbind/preproc_for_main_model/generate_data/igmodel_output_prep"
+function: "entry_point"
+python_interpreter: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/miniconda3/envs/igmodel-env/bin/python"
+basic_data_path: "data/pdbbind"
+input:
+  dataset_path: "{basic_data_path}/core/temp"
+  output_dir: "{basic_data_path}/core/stage_3_backbone_processed_outputs"
+  log_dir: "{basic_data_path}/metadata/generated/backbone_generation_outputs_summary"
+  model_path: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/for_ProtLigMap/models/backbone/IGModel/models/saved_model.pth"
+  scripts_path: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/for_ProtLigMap/models/backbone/IGModel/scripts"

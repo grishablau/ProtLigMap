@@ -1,0 +1,11 @@
+step: "Remove folders with non rdk-friendly files"
+description: "Remove folders with non rdk-friendly files (at least one file)"
+function file: "pdbbind/cleanup/rdk_friendly"
+function: "filter_rdkit_friendly_folders"
+
+basic_data_path: "data/pdbbind"
+igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+
+input:
+  input_path: "${{ igmodel_initial_cleanup_output_path }}/stage_3_no_peptide_ligands"
+  output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_4_only_rdk_friendly"

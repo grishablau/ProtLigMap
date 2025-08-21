@@ -1,0 +1,13 @@
+step: "Process Data"
+description: "Process Data."
+function file: "preproc_data"
+function: "preproc_data_for_ai"
+input:
+  data_path: "data/raw/raw_data.parquet"
+  output: "data/proc/proc_data.parquet"
+  valid_standard_types: IC50 pIC50
+  debug_mode: False
+  settings: config/settings/preproc_data/processed/processed_settings.py
+#  input_file_path: "config/settings/preproc_data/raw/fetch_proc.yaml"
+#  save: "processed_settings.py"
+#return: "python object of settings"

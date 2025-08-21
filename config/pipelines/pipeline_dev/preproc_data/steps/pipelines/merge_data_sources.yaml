@@ -1,0 +1,38 @@
+pipeline:
+  name: "Merge data sources"
+  version: "v1"
+  description: "Merging data folders, indexes and varifying evreything is consistent"
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+
+  basic_data_path: "data/pdbbind"
+  igmodel_initial_cleanup_input_path: "${{ basic_data_path }}/core/raw/for_use"
+  igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+  input_path: "${{ igmodel_initial_cleanup_input_path }}"
+  output_paths: 
+    data_path: "${{ igmodel_initial_cleanup_output_path }}/stage_1_merged"
+    metadata_path: "${{ basic_data_path }}/metadata/generated/core_metadata"
+
+  steps:
+    pdbbind/pdb_verify_subsetism:
+      input:
+        general_index: "${{ input_path }}/pdbbind_v2019_other_PL"
+        refined_index: "${{ input_path }}/pdbbind_v2019_refined"
+        require_confirmation: "True"
+    shared/merge_folders:
+      input:
+        input_paths:
+          - "${{ input_path }}/pdbbind_v2019_other_PL"
+          - "${{ input_path }}/pdbbind_v2019_refined" 
+        output_path: "${{ output_paths.data_path }}"
+    shared/merge_metadata:
+      input:
+        input_paths:
+          - "${{ input_path }}/PDBbind_v2019_plain_text_index/plain-text-index/index/INDEX_refined_data.2019"
+          - "${{ input_path }}/PDBbind_v2019_plain_text_index/plain-text-index/index/INDEX_general_PL_data.2019"
+        output_path: "${{ output_paths.metadata_path }}/combined_metadata.txt"
+    shared/merging_verification:
+      input:
+        data_path: "${{ output_paths.data_path }}"
+        metadata_path: "${{ output_paths.metadata_path }}"
+        require_confirmation: "True"

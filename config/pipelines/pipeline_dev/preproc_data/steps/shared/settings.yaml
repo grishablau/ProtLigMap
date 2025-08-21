@@ -1,0 +1,8 @@
+step: "Process Settings"
+description: "Converts YAML settings to Python format."
+function file: "shared/settings"
+function: "load_and_process_settings_yaml"
+input:
+  input_file_path: "config/settings/preproc_data/raw/pdbbind/proc.yaml"
+  save: "processed_settings.py"
+return: "python object of settings"

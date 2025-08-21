@@ -1,0 +1,10 @@
+# Ignore everything inside data/, but keep the folder itself
+data/*
+!data/.gitkeep
+
+# Ignore virtual environment
+.venv/
+
+# Ignore submodules / embedded repos
+models/backbone/IGModel/
+notebooks/smiles2dta_demo/

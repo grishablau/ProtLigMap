@@ -1,0 +1,17 @@
+step: "Merging verification"
+description: "Verify completely data merge"
+function file: "pdbbind/cleanup/pdb_verify_merge"
+function: "verify_index_vs_folder"
+
+basic_data_path: "data/pdbbind"
+igmodel_initial_cleanup_input_path: "${{ basic_data_path }}/core/raw/for_use"
+igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+input_path: "${{ igmodel_initial_cleanup_input_path }}"
+output_paths: 
+  data_path: "${{ igmodel_initial_cleanup_output_path }}/stage_1_merged"
+  metadata_path: "${{ basic_data_path }}/metadata/generated/core_metadata"
+
+input:
+  data_path: "${{ output_paths.data_path }}"
+  metadata_path: "${{ output_paths.metadata_path }}"
+  require_confirmation: "True"

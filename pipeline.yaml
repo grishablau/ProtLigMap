@@ -1,0 +1,146 @@
+pipeline:
+  name: "Pipeline raw to model-data-preperation"
+  description: "Processes data starting from the raw PDBbind download, passing through the backbone model (IGModel currently), and prepares it as input for preproc (split, normalized, etc.) for the main machine learning model"
+  version: v1
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+  basic_data_path: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/for_ProtLigMap/data/pdbbind"
+  igmodel_initial_cleanup_input_path: "{basic_data_path}/core/raw/for_use"
+  igmodel_initial_cleanup_output_path: "{basic_data_path}/core/stage_1_cleaned"
+  general_index_general: "{igmodel_initial_cleanup_input_path}/plain-text-index/index/INDEX_general_PL_data.2019"
+  refined_index_general: "{igmodel_initial_cleanup_input_path}/plain-text-index/index/INDEX_refined_data.2019"
+  original_folders_to_merge: "{igmodel_initial_cleanup_input_path}/v2019-other-PL, {igmodel_initial_cleanup_input_path}/refined-set"
+  output_folder_to_merge_to: "{igmodel_initial_cleanup_output_path}/stage_1_merged"
+  merge_metadata_file_path: "{basic_data_path}/metadata/generated/core_metadata/combined_metadata.txt"
+  steps:
+
+    #   _      ____          _                  ____  _                      _               
+    #  / | _  |  _ \   __ _ | |_  __ _         / ___|| |  ___   __ _  _ __  (_) _ __    __ _ 
+    #  | |(_) | | | | / _` || __|/ _` | _____ | |    | | / _ \ / _` || '_ \ | || '_ \  / _` |
+    #  | | _  | |_| || (_| || |_| (_| ||_____|| |___ | ||  __/| (_| || | | || || | | || (_| |
+    #  |_|(_) |____/  \__,_| \__|\__,_|        \____||_| \___| \__,_||_| |_||_||_| |_| \__, |
+    #                                                                                  |___/ 
+
+    # Verify that the refined pdb set is a subset of the general pdb set
+    pdbbind/pdb_verify_subsetism:
+      input:
+        general_index: "{general_index_general}"
+        refined_index: "{refined_index_general}"
+        require_confirmation: "False"
+    # Merge both folders into one
+    shared/merge_folders:
+      input:
+        input_paths: "{original_folders_to_merge}"
+        output_path: "{output_folder_to_merge_to}"
+    # Merge their metadata
+    shared/merge_metadata:
+      input:
+        input_paths:
+          "{general_index_general}, 
+          {refined_index_general}"
+        output_path: "{merge_metadata_file_path}"
+
+    # Verify equality between metadata file info and folders
+    shared/merging_verification:
+      input:
+        data_path: "{output_folder_to_merge_to}"
+        metadata_path: "{merge_metadata_file_path}"
+        require_confirmation: "True"
+
+    # Filter out data that is from 2016 (might be used further on for testing set)
+    shared/filter_out_data_folders:
+      input:
+        exclude_folders_index_path: "{basic_data_path}/metadata/manual/2016_metadata_pdbbind/casf2016_ids.txt"
+        main_data_path: "{output_folder_to_merge_to}"
+        output_path: "{igmodel_initial_cleanup_output_path}/stage_2_filtered_data"
+
+    # Remove ligands which are peptides
+    pdbbind/rm_peptide_ligands:
+      input:
+        input_path: "{igmodel_initial_cleanup_output_path}/stage_2_filtered_data"
+        output_path: "{igmodel_initial_cleanup_output_path}/stage_3_no_peptide_ligands"
+
+    # Remove folders with non rdk friendly files
+    pdbbind/rdk_friendly:
+      input:
+        input_path: "{igmodel_initial_cleanup_output_path}/stage_3_no_peptide_ligands"
+        output_path: "{igmodel_initial_cleanup_output_path}/stage_4_only_rdk_friendly"
+
+    #   ____       ____   ____   _____  ____   ____    ___    ____        _____  ___   ____         ____     _     ____  _  __ ____    ___   _   _  _____ 
+    #  |___ \  _  |  _ \ |  _ \ | ____||  _ \ |  _ \  / _ \  / ___|      |  ___|/ _ \ |  _ \       | __ )   / \   / ___|| |/ /| __ )  / _ \ | \ | || ____|
+    #    __) |(_) | |_) || |_) ||  _|  | |_) || |_) || | | || |    _____ | |_  | | | || |_) |_____ |  _ \  / _ \ | |    | ' / |  _ \ | | | ||  \| ||  _|  
+    #   / __/  _  |  __/ |  _ < | |___ |  __/ |  _ < | |_| || |___|_____||  _| | |_| ||  _ <|_____|| |_) |/ ___ \| |___ | . \ | |_) || |_| || |\  || |___ 
+    #  |_____|(_) |_|    |_| \_\|_____||_|    |_| \_\ \___/  \____|      |_|    \___/ |_| \_\      |____//_/   \_\\____||_|\_\|____/  \___/ |_| \_||_____|                                                                                                                                                                                                                                                                                                 
+
+    # Convert proteins into a form that is ready for docking
+    pdbbind/prep_protein_for_igmodel:
+      input:
+        input_path: "{igmodel_initial_cleanup_output_path}/stage_4_only_rdk_friendly"
+        max_workers: "96"
+        output_path: "{basic_data_path}/core/stage_2_helper_model_ready"
+        mgtools_path: "~/Downloads/mgltools_x86_64Linux2_1.5.7p1/mgltools_x86_64Linux2_1.5.7" # path to MGLTools, used for cleaning and preparing protein complexes
+
+    # Convert ligands to pdbqt files (for docking) and prepare docking boxes file
+    pdbbind/ligand_to_pdbqt_and_get_boxes:
+      input:
+        input_path: "{basic_data_path}/core/stage_1_cleaned/stage_4_only_rdk_friendly" # data after cleaning but before preprocssing for igmodel use
+        output_path: "{basic_data_path}/core/stage_2_helper_model_ready" # data ready fully for direct use for igmodel
+        max_workers: "96" # number of parallel workers to use for processing
+        mgtools_path: "~/Downloads/mgltools_x86_64Linux2_1.5.7p1/mgltools_x86_64Linux2_1.5.7" # path to MGLTools, used for cleaning and preparing protein complexes
+        docking_path: "{basic_data_path}/metadata/generated/docking"
+
+    # Generate docking files
+    pdbbind/gen_docking:
+      input:
+        max_workers: "96" # number of parallel workers to use for processing
+        dataset_path: "{basic_data_path}/core/stage_2_helper_model_ready" # str, path to folder with complex subfolders
+        # dataset_path: "{basic_data_path}/core/temp"
+        docking_summaries_path: "{basic_data_path}/metadata/generated/docking/docking_summaries" # str, folder to save docking summaries
+        box_file_path: "{basic_data_path}/metadata/generated/docking/docking_box_coordinates_exp.txt" # str, path to box coordinate file
+        vina_path: "~/Downloads/autodock_vina_1_1_2_linux_x86/bin/vina" # str, path to vina processing file
+
+    # Refine docking and all the data to be ready for backbone model (igmodel in this case)
+    pdbbind/refine_docking_for_igmodel:
+      input:
+        dataset_path: "{basic_data_path}/core/stage_2_helper_model_ready" 
+        log_folder: "{basic_data_path}/metadata/generated/postprocess_docking_outputs_summary"
+
+    # Copy sdf ligand files acording to the folders that are left
+    pdbbind/copy_sdf:
+      input:
+        sdf_source: "{basic_data_path}/core/stage_1_cleaned/stage_4_only_rdk_friendly"
+        sdf_destination: "{basic_data_path}/core/stage_2_helper_model_ready"  
+
+    #   _____      ____  _____  _   _  _____  ____      _   _____  _____      ____     _     ____  _  __ ____    ___   _   _  _____       _____  _____     _   _____  _   _  ____   _____  ____  
+    #  |___ / _   / ___|| ____|| \ | || ____||  _ \    / \ |_   _|| ____|    | __ )   / \   / ___|| |/ /| __ )  / _ \ | \ | || ____|     |  ___|| ____|   / \ |_   _|| | | ||  _ \ | ____|/ ___| 
+    #    |_ \(_) | |  _ |  _|  |  \| ||  _|  | |_) |  / _ \  | |  |  _|      |  _ \  / _ \ | |    | ' / |  _ \ | | | ||  \| ||  _|       | |_   |  _|    / _ \  | |  | | | || |_) ||  _|  \___ \ 
+    #   ___) |_  | |_| || |___ | |\  || |___ |  _ <  / ___ \ | |  | |___     | |_) |/ ___ \| |___ | . \ | |_) || |_| || |\  || |___      |  _|  | |___  / ___ \ | |  | |_| ||  _ < | |___  ___) |
+    #  |____/(_)  \____||_____||_| \_||_____||_| \_\/_/   \_\|_|  |_____|    |____//_/   \_\\____||_|\_\|____/  \___/ |_| \_||_____|     |_|    |_____|/_/   \_\|_|   \___/ |_| \_\|_____||____/ 
+
+    # Output embeddings and W from model. W will be used for pIC50 further generation, while embeddings will be the input features of the model
+    pdbbind/igmodel_output_prep:
+      input:
+        dataset_path: "{basic_data_path}/core/stage_2_helper_model_ready" 
+        output_dir: "{basic_data_path}/core/stage_3_backbone_processed_outputs"
+        log_dir: "{basic_data_path}/metadata/generated/backbone_generation_outputs_summary"
+        model_path: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/for_ProtLigMap/models/backbone/IGModel/models/saved_model.pth"
+        scripts_path: "/media/racah/2b2b05ab-497e-47ab-a698-6e77a3b775c4/grisha/for_ProtLigMap/models/backbone/IGModel/scripts"
+
+    # Generate pic50 metadata , in this current case it's our supervisory metadata
+    pdbbind/gen_pic50:
+      input:
+        base_dir: "{basic_data_path}/core/stage_2_helper_model_ready"  # Directory containing PDB-named subfolders with SDF files.
+        w_data_dir: "{basic_data_path}/core/stage_3_backbone_processed_outputs" # Directory containing corresponding `.npz` weight files.
+        pkd_nat_file: "{basic_data_path}/metadata/generated/core_metadata/combined_metadata.txt"  # Path to the file containing pKd values for each PDB code.
+        output_txt_path: "{basic_data_path}/metadata/generated/core_metadata/backbone/generated_pic50.txt" # Path to write the tab-separated output text file.
+        output_npz_path: "{basic_data_path}/metadata/generated/core_metadata/backbone/generated_pic50.npz" # Path to write the dense `.npz` file with pose-to-pIC50 mappings.
+        log_dir: "{basic_data_path}/metadata/generated/core_metadata/backbone" # Directory to save the error log file.
+
+    # Generate proteins metadata , in this current case it's our supervisory metadata
+    pdbbind/gen_protein:
+      input:
+        index_file: "{basic_data_path}/metadata/generated/core_metadata/combined_metadata.txt" # Path to a file listing all candidate PDB codes (one per line).
+        merge_exp_dir: "{basic_data_path}/core/stage_2_helper_model_ready"  # Directory containing subfolders for each PDB code with protein PDB files.
+        output_file: "{basic_data_path}/metadata/generated/core_metadata/backbone/protein_fingerprints.npz" # Path to the `.npz` file where fingerprints and PDB codes will be saved.
+        log_file: "{basic_data_path}/metadata/generated/core_metadata/backbone/protein_conversion_errors.log" # Path to the log file where any errors or skipped PDBs will be recorded.
+

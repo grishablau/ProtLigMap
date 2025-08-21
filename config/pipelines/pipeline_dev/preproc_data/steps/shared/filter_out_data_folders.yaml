@@ -1,0 +1,12 @@
+step: "Filter out folders by other folders"
+description: "Filter out folders in main folder by indexes of other unwanted folders"
+function file: "shared/folders_management"
+function: "exclude_intersection"
+
+basic_data_path: "data/pdbbind"
+igmodel_initial_cleanup_output_path: "${{ basic_data_path }}/core/stage_1_cleaned"
+
+input:
+  exclude_folders_index_path: "${{ basic_data_path }}/metadata/manual/exclude_data.txt"
+  main_data_path: "${{ igmodel_initial_cleanup_output_path }}/stage_1_merged"
+  output_path: "${{ igmodel_initial_cleanup_output_path }}/stage_2_filtered_data"

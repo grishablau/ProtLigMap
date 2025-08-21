@@ -1,0 +1,11 @@
+step: "Prepare protein input for igmodel"
+description: "Prepare protein input for igmodel"
+function file: "pdbbind/for_igmodel_prep/prep_proteins"
+function: "process_all_protein_complexes"
+basic_data_path: "data/pdbbind"
+input:
+  input_path: "${{ basic_data_path }}/core/stage_1_cleaned/stage_4_only_rdk_friendly" # data after cleaning but before preprocssing for igmodel use
+  output_path: "${{ basic_data_path }}/core/stage_2_helper_model_ready" # data ready fully for direct use for igmodel
+  max_workers: "96" # number of parallel workers to use for processing
+  mgtools_path: "~/Downloads/mgltools_x86_64Linux2_1.5.7p1/mgltools_x86_64Linux2_1.5.7" # path to MGLTools, used for cleaning and preparing protein complexes
+

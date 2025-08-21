@@ -1,0 +1,11 @@
+step: "Generate protein fingerprints"
+description: "Generate protein fingerprints"
+function file: "pdbbind/preproc_for_main_model/generate_data/protein_preproc"
+function: "generate_protein_fingerprints"
+basic_data_path: "data/pdbbind"
+
+input:
+  index_file: "{basic_data_path}/metadata/generated/core_metadata/combined_metadata.txt" # Path to a file listing all candidate PDB codes (one per line).
+  merge_exp_dir: "{basic_data_path}/core/temp" # Directory containing subfolders for each PDB code with protein PDB files.
+  output_file: "{basic_data_path}/metadata/generated/core_metadata/backbone/protein_fingerprints.npz" # Path to the `.npz` file where fingerprints and PDB codes will be saved.
+  log_file: "{basic_data_path}/metadata/generated/core_metadata/backbone/protein_conversion_errors.log" # Path to the log file where any errors or skipped PDBs will be recorded.

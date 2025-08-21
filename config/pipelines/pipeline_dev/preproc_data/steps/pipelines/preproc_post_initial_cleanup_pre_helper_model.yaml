@@ -1,0 +1,21 @@
+pipeline:
+  name: "Prepare data for helper model"
+  version: "v1"
+  description: "Prepare data for IGModel after initial cleanup"
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+  basic_data_path: "data/pdbbind"
+  data_to_preproc_before_igmodel_input: "${{ basic_data_path }}/core/stage_1_cleaned/stage_4_only_rdk_friendly"
+  data_ready_for_igmodel_use: "${{ basic_data_path }}/core/stage_2_helper_model_ready"
+  steps:
+    pdbbind/prep_protein_for_igmodel:
+      input:
+        input_path: "${{ data_to_preproc_before_igmodel_input }}"
+        max_workers: 96
+        output_path: "${{ data_ready_for_igmodel_use }}"
+        mgtools_path: "~/Downloads/mgltools_x86_64Linux2_1.5.7p1/mgltools_x86_64Linux2_1.5.7" # path to MGLTools, used for cleaning and preparing protein complexes
+    pdbbind/ligand_to_pdbqt_and_get_boxes:
+      input:
+
+    pdbbind/gen_docking:
+    pdbbind/refine_docking_for_igmodel:

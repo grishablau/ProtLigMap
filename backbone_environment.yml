@@ -1,0 +1,16 @@
+name: igmodel-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - cudatoolkit=11.8
+  - rdkit
+  - numpy
+  - pandas
+  - openbabel
+  - spyrmsd
+  - lightning-utilities
+  - pip
+  - pip:
+    - -r backbone_requirements.txt

@@ -1,0 +1,11 @@
+step: "Verify that one set is a subset of another"
+description: "Verify that one set is a subset of another = subestism. In this case, apply it to check if refined set is a subset of general in pdb"
+function file: "pdbbind/cleanup/pdb_verify_subsetism"
+function: "check_refined_subset"
+basic_data_path: "data/pdbbind"
+igmodel_initial_cleanup_input_path: "{basic_data_path}/core/raw/for_use"
+
+input:
+  general_index: "{igmodel_initial_cleanup_input_path}/pdbbind_v2019_other_PL"
+  refined_index: "{igmodel_initial_cleanup_input_path}/pdbbind_v2019_refined"
+  require_confirmation: "True"

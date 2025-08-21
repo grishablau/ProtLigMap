@@ -1,0 +1,10 @@
+pipeline:
+  name: "Fetch and Preproc InstConf"
+  version: "v1"
+  description: "This pipeline_old processes settings, fetches, and preprocesses data."
+  pipeline steps folder: "config/pipelines/pipeline_dev/preproc_data/steps"
+  pipeline functions folder: "src/functions"
+
+  steps:
+
+    settings

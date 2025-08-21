@@ -1,0 +1,13 @@
+step: "Generate pic50 values from given ones and from W values generated from igmodel"
+description: "Generate pic50 values from given ones and from W values generated from igmodel"
+function file: "pdbbind/preproc_for_main_model/generate_data/pic50_preproc"
+function: "generate_pic50_labels"
+basic_data_path: "data/pdbbind"
+
+input:
+  base_dir: "{basic_data_path}/core/temp" # Directory containing PDB-named subfolders with SDF files.
+  w_data_dir: "{basic_data_path}/core/stage_3_backbone_processed_outputs" # Directory containing corresponding `.npz` weight files.
+  pkd_nat_file: "{basic_data_path}/metadata/generated/core_metadata/combined_metadata.txt"  # Path to the file containing pKd values for each PDB code.
+  output_txt_path: "{basic_data_path}/metadata/generated/core_metadata/backbone/generated_pic50.txt" # Path to write the tab-separated output text file.
+  output_npz_path: "{basic_data_path}/metadata/generated/core_metadata/backbone/generated_pic50.npz" # Path to write the dense `.npz` file with pose-to-pIC50 mappings.
+  log_dir: "{basic_data_path}/metadata/generated/core_metadata/backbone" # Directory to save the error log file.

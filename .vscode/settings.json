@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/functions/pdbbind/preproc_for_main_model/preproc/data_functions",
+        "./notebooks/manifold_model"
+    ],
+    "python-envs.pythonProjects": []
+}

@@ -1,0 +1,8 @@
+step: "Fetch and Preprocess Data"
+description: "Fetches data and preprocesses it according to the loaded settings."
+function file: "fetch_data"
+function: "fetch_and_process_data"
+input:
+  input_file_path: "config/settings/preproc_data/processed/processed_settings.py"
+  save_data_path: "data/raw/raw_data.parquet"
+return: "raw data object"

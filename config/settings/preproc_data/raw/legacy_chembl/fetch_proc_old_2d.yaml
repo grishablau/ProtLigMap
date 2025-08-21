@@ -1,0 +1,36 @@
+add_column_params:
+  db_name: chembl_db
+  tb_name: bioactivity
+  clm_name: kinase_name
+  MYSQL_CONFIG:
+    database: "chembl_db"
+    host: "localhost"
+    user: "root"
+    password: "Grisha@123!"
+    use_pure: True
+std_type_list:
+  - IC50
+  - pIC50
+fetch_columns:
+  molecule_chembl_id
+  canonical_smiles
+  assay_chembl_id
+  standard_type
+  standard_value
+  standard_units
+limit: 1000
+max_records: 1000
+min_ligand_per_kinase: 2
+offset: 0
+activity_url: "https://www.ebi.ac.uk/chembl/api/data/activity.json?limit={limit}&offset={offset}"
+assay_url: "https://www.ebi.ac.uk/chembl/api/data/assay/"
+target_url: "https://www.ebi.ac.uk/chembl/api/data/target/"
+target_component_url: "https://www.ebi.ac.uk/chembl/api/data/target_component/"
+#std_type_filter_by: "'IC50' 'pIC50' 'Ki' 'Ki low' 'Ki high' 'MIC50' 'Kd'"
+std_type_filter_by: "IC50 pIC50"
+num_kinase_with_min_ligands: 2
+
+ligand_emb_model: "seyonec/ChemBERTa-zinc-base-v1"
+
+prot_emb_model: "facebook/esm2_t6_8M_UR50D"
+

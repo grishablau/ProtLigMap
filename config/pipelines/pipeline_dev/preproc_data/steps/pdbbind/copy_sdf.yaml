@@ -1,0 +1,9 @@
+step: "Copy sdf ligand files to the new sub folder"
+description: "Copy sdf ligand files to the new sub folder"
+function file: "pdbbind/for_igmodel_prep/sdf_copy"
+function: "copy_sdf_files"
+basic_data_path: "data/pdbbind"
+
+input:
+  sdf_source: "{basic_data_path}/core/stage_1_cleaned/stage_4_only_rdk_friendly"
+  sdf_destination: "{basic_data_path}/core/temp"
