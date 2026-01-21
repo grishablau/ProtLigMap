@@ -1,3 +1,7 @@
+# Updates 
+
+Make sure to check out the relevant blog https://medium.com/@gregory.berlinerblau
+
 # ProtLigMap Pipeline
 
 This repository implements a modular pipeline for processing protein-ligand data, embedding it using deep learning models, and running downstream machine learning tasks.
